@@ -1,0 +1,2 @@
+E:\INSA\5A\securite\app2\SansSoussi\SansSoussi\SansSoussi\obj\Release\SansSoussi.csprojAssemblyReference.cache
+E:\INSA\5A\securite\app2\SansSoussi\SansSoussi\SansSoussi\obj\Release\SansSoussi.csproj.CoreCompileInputs.cache
