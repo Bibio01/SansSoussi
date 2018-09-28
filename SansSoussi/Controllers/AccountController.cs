@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
+using Microsoft.Security.Application;
 using SansSoussi.Models;
 
 namespace SansSoussi.Controllers
@@ -55,7 +56,7 @@ namespace SansSoussi.Controllers
                         byte[] result_mid;
                         byte[] result;
 
-                        SHA512 shaM = new SHA512Managed();
+                        SHA1 shaM = new SHA1Managed();
                         result_mid = shaM.ComputeHash(toEncodeAsBytes);
                         /*
                         var salt = Guid.NewGuid().ToString();

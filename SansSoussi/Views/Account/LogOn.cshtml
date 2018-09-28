@@ -18,6 +18,7 @@
 
 @Html.ValidationSummary(true, "Login was unsuccessful. Please correct the errors and try again.")
 
+
 @using (Html.BeginForm())
 {
     <div>
@@ -45,9 +46,14 @@
                 @Html.LabelFor(m => m.RememberMe)
             </div>
 
-            <p>
-                <input type="submit" value="Log On" />
-            </p>
+            
+                <button type="submit" value="Log On">Log On</button>
+            
+            
+               @*<input type="checkbox" id="isAutoLoginId" />
+                <label for="autologin">auto connection next time?</label>
+            *@
         </fieldset>
     </div>
 }
+
