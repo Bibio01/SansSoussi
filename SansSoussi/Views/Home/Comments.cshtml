@@ -14,14 +14,22 @@
 <h2>Comments</h2>
 
 <div id="CommentsBlock">
-@foreach(var comment in Model)
-{
-    <div>
-        @Html.Raw(comment)
-    </div>
-}
+    @foreach (var comment in Model)
+    {
+        <div>
+            @Html.Raw(comment)
+        </div>
+    }
 </div>
 
-<textarea rows="2" cols="20" id="NewComment" style="display:none;" ></textarea>
-
-<input id="NewCommentsBtn" onclick="AddComments();" value="Nouveau commentaire" type="button" />
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div>
+        <fieldset>
+            <legend>Ajouter un commentaire</legend>
+            <textarea rows="2" cols="20" id="comment" name="comment"></textarea>
+            <input type="submit" value="Ajouter" />
+        </fieldset>
+    </div>
+}

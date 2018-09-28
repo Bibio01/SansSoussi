@@ -10,6 +10,7 @@ using System.Web.Routing;
 using System.Web.Security;
 using Microsoft.Security.Application;
 using SansSoussi.Models;
+using SecurityEssentials.Core.Attributes;
 
 namespace SansSoussi.Controllers
 {
@@ -37,6 +38,8 @@ namespace SansSoussi.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AllowXRequestsEveryXSecondsAttribute(Name = "LogOn", Message = "You have performed this action more than {x} times in the last {n} seconds.", Requests = 5, Seconds = 60)]
         public ActionResult LogOn(LogOnModel model, string returnUrl)
         {
             if (ModelState.IsValid)
@@ -103,6 +106,7 @@ namespace SansSoussi.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Register(RegisterModel model)
         {
             if (ModelState.IsValid)

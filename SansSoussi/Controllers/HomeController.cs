@@ -33,7 +33,9 @@ namespace SansSoussi.Controllers
             MembershipUser user = Membership.Provider.GetUser(HttpContext.User.Identity.Name, true);
             if (user != null)
             {
-                SqlCommand cmd = new SqlCommand("Select Comment from Comments where UserId ='" + user.ProviderUserKey + "'", _dbConnection);
+                string query = "Select Comment from Comments where UserId = @userId";
+                SqlCommand cmd = new SqlCommand(query, _dbConnection);
+                cmd.Parameters.AddWithValue("@userId", user.ProviderUserKey);
                 _dbConnection.Open();
                 SqlDataReader rd = cmd.ExecuteReader();
 
@@ -50,10 +52,10 @@ namespace SansSoussi.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
+        [ValidateAntiForgeryToken]
         public ActionResult Comments(string comment)
         {
             string EncodedComment = Encoder.HtmlEncode(comment);
-            string status = "success";
             try
             {
                 //Get current user from default membership provider
@@ -61,12 +63,15 @@ namespace SansSoussi.Controllers
                 if (user != null)
                 {
                     //add new comment to db
-                    SqlCommand cmd = new SqlCommand(
-                        "insert into Comments (UserId, CommentId, Comment) Values ('" + user.ProviderUserKey + "','" + Guid.NewGuid() + "','" + EncodedComment + "')",
-                    _dbConnection);
+                    string query = "insert into Comments (UserId, CommentId, Comment) Values (@userId, @guid, @encodedComment)";
+                    SqlCommand cmd = new SqlCommand(query, _dbConnection);
+                    cmd.Parameters.AddWithValue("@userId", user.ProviderUserKey);
+                    cmd.Parameters.AddWithValue("@guid", Guid.NewGuid());
+                    cmd.Parameters.AddWithValue("@encodedComment", EncodedComment);
                     _dbConnection.Open();
 
                     cmd.ExecuteNonQuery();
+                    _dbConnection.Close();
                 }
                 else
                 {
@@ -75,14 +80,11 @@ namespace SansSoussi.Controllers
             }
             catch (Exception ex)
             {
-                status = ex.Message;
-            }
-            finally
-            {
                 _dbConnection.Close();
+                throw new Exception(ex.Message);
             }
 
-            return Json(status);
+            return Comments();
         }
 
         public ActionResult Search(string searchData)
@@ -96,7 +98,10 @@ namespace SansSoussi.Controllers
             {
                 if (!string.IsNullOrEmpty(searchData))
                 {
-                    SqlCommand cmd = new SqlCommand("Select Comment from Comments where UserId = '" + user.ProviderUserKey + "' and Comment like '%" + searchData + "%'", _dbConnection);
+                    string query = "Select Comment from Comments where UserId = @userId and Comment like @searchData";
+                    SqlCommand cmd = new SqlCommand(query, _dbConnection);
+                    cmd.Parameters.AddWithValue("@userId", user.ProviderUserKey);
+                    cmd.Parameters.AddWithValue("@searchData", '%' + searchData + '%');
                     _dbConnection.Open();
                     SqlDataReader rd = cmd.ExecuteReader();
 
