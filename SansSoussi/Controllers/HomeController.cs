@@ -87,21 +87,26 @@ namespace SansSoussi.Controllers
             return Comments();
         }
 
+        [ValidateInput(false)]
         public ActionResult Search(string searchData)
         {
+            
             List<string> searchResults = new List<string>();
 
             //Get current user from default membership provider
             
             MembershipUser user = Membership.Provider.GetUser(HttpContext.User.Identity.Name, true);
+            
             if (user != null)
             {
                 if (!string.IsNullOrEmpty(searchData))
                 {
-                    string query = "Select Comment from Comments where UserId = @userId and Comment like @searchData";
+                    string encodedSearchData = Encoder.HtmlEncode(searchData);
+                    string query = "Select Comment from Comments where UserId = @userId and Comment like @encodedSearchData";
                     SqlCommand cmd = new SqlCommand(query, _dbConnection);
                     cmd.Parameters.AddWithValue("@userId", user.ProviderUserKey);
-                    cmd.Parameters.AddWithValue("@searchData", '%' + searchData + '%');
+                    
+                    cmd.Parameters.AddWithValue("@encodedSearchData", '%' + encodedSearchData + '%');
                     _dbConnection.Open();
                     SqlDataReader rd = cmd.ExecuteReader();
 

@@ -68,6 +68,7 @@ namespace SansSoussi.Controllers
                         result = shaM.ComputeHash(array_mid);
                         */
                         HttpCookie authCookie = new HttpCookie("username",System.Text.ASCIIEncoding.ASCII.GetString(result_mid));
+                        authCookie.Expires = DateTime.Now.AddDays(-1d);
                         HttpContext.Response.Cookies.Add(authCookie);
                         
                         return RedirectToAction("Index", "Home");
@@ -87,10 +88,12 @@ namespace SansSoussi.Controllers
         // **************************************
         // URL: /Account/LogOff
         // **************************************
-
+        
         public ActionResult LogOff()
         {
             FormsService.SignOut();
+
+            //HttpContext.Response.Cookies.Clear();
 
             return RedirectToAction("Index", "Home");
         }
@@ -106,9 +109,12 @@ namespace SansSoussi.Controllers
         }
 
         [HttpPost]
+        [ValidateInput(false)]
         [ValidateAntiForgeryToken]
         public ActionResult Register(RegisterModel model)
         {
+
+            model.Password = Encoder.HtmlEncode(model.Password);
             if (ModelState.IsValid)
             {
                 // Attempt to register the user
@@ -116,11 +122,21 @@ namespace SansSoussi.Controllers
 
                 if (createStatus == MembershipCreateStatus.Success)
                 {
+
+                    byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(model.UserName);
+                    byte[] result;
+
+                    SHA1 shaM = new SHA1Managed();
+                    result = shaM.ComputeHash(toEncodeAsBytes);
                     FormsService.SignIn(model.UserName, false /* createPersistentCookie */);
                     //Encode the username in base64
-                    byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(model.UserName);
-                    HttpCookie authCookie = new HttpCookie("username", System.Convert.ToBase64String(toEncodeAsBytes));
+
+                    HttpCookie authCookie = new HttpCookie("username", System.Text.ASCIIEncoding.ASCII.GetString(result));
                     HttpContext.Response.Cookies.Add(authCookie);
+
+                    //byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(model.UserName);
+                    //HttpCookie authCookie = new HttpCookie("username", System.Convert.ToBase64String(toEncodeAsBytes));
+                    
                     return RedirectToAction("Index", "Home");
                     
                 }

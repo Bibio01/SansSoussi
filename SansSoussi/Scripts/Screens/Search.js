@@ -1,17 +1,17 @@
 ﻿window.onbeforeunload = confirmeExit;
 function confirmeExit() {
-    var storage = window.localStorage;
+    var storage = window.sessionStorage;
     storage.setItem("inputString", document.getElementById('searchBox').value);
-    
+    alert(1);
 }
 function search() {
     window.location = ResolveUrl("~/home/Search?searchData=" + $("#searchBox").val());
-    var storage = window.localStorage;
+    var storage = window.sessionStorage;
     //storage.setItem("inputString",document.getElementById('searchBox').value);
     
 }
 $(document).ready(function () {
-    var storage = window.localStorage;
+    var storage = window.sessionStorage;
     var input = storage["inputString"];
     
     $.ajax({
