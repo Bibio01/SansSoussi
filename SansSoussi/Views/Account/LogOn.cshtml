@@ -20,6 +20,7 @@
 
 @using (Html.BeginForm())
 {
+    @Html.AntiForgeryToken()
     <div>
         <fieldset>
             <legend>Account Information</legend>
